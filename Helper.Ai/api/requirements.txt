@@ -1,0 +1,5 @@
+flask
+flask-bcrypt
+flask-sqlalchemy
+psycopg2-binary
+groq
