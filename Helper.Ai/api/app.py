@@ -1,3 +1,10 @@
+import sys, os
+
+# Add Helper.Ai directory to path
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Helper.Ai', 'api'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Helper.Ai'))
+
+from app import app
 from flask import Flask, render_template, request, jsonify, session, send_file
 # from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_bcrypt import Bcrypt
@@ -6,6 +13,7 @@ from functools import wraps
 from db import db, User, Document, SharedDocument
 from ai_engine import generate_ppt, generate_report, generate_notes
 from io import BytesIO
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 app = Flask(__name__,
