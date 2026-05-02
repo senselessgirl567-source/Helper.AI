@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shared Document | Helper.ai</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body class="landing-body">
+  <div style="max-width:700px;margin:60px auto;padding:24px;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:16px;">
+    <h1 style="margin-bottom:12px;font-size:28px;">Shared document</h1>
+    <p style="font-size:15px;color:#555;line-height:1.6;">This document has been shared with you.</p>
+    <div style="margin-top:20px;padding:18px;background:#F7F5FF;border-radius:14px;">
+      <div style="font-size:13px;color:#777;margin-bottom:6px;">Title</div>
+      <div style="font-size:18px;font-weight:600;color:#121212;">{{ doc.title }}</div>
+      <div style="margin-top:12px;font-size:13px;color:#555;">Type: {{ doc.doc_type }}</div>
+      <div style="margin-top:10px;font-size:13px;color:#555;">Created at: {{ doc.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+    </div>
+    <div style="margin-top:20px;">
+      <h2 style="font-size:16px;margin-bottom:8px;">Content</h2>
+      <pre style="white-space:pre-wrap;background:#F6F5F0;padding:16px;border-radius:12px;border:1px solid rgba(0,0,0,.06);">{{ doc.content }}</pre>
+    </div>
+    <a href="/" style="display:inline-block;margin-top:20px;color:#5340B7;">Return home</a>
+  </div>
+</body>
+</html>

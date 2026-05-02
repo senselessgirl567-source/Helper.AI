@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Helper.ai — Sign In</title>
+<link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body class="auth-body">
+<div class="auth-card">
+  <div class="auth-logo">Helper<span class="logo-accent">.ai</span></div>
+  <div class="auth-tagline">Intelligent study assistant</div>
+
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tab-login" onclick="showTab('login')">Sign in</button>
+    <button class="auth-tab" id="tab-register" onclick="showTab('register')">Register</button>
+  </div>
+
+  <!-- Login -->
+  <div id="form-login" class="auth-form">
+    <input class="auth-input" id="login-email" type="email" placeholder="Email address" />
+    <input class="auth-input" id="login-password" type="password" placeholder="Password" />
+    <button class="btn btn-primary btn-block" onclick="doLogin()">Sign in</button>
+    <div id="login-error" class="auth-error hidden"></div>
+  </div>
+
+  <!-- Register -->
+  <div id="form-register" class="auth-form hidden">
+    <input class="auth-input" id="reg-name" type="text" placeholder="Full name" />
+    <input class="auth-input" id="reg-email" type="email" placeholder="Email address" />
+    <input class="auth-input" id="reg-password" type="password" placeholder="Password (min 6 chars)" />
+    <button class="btn btn-primary btn-block" onclick="doRegister()">Create account</button>
+    <div id="reg-error" class="auth-error hidden"></div>
+  </div>
+
+  <div class="auth-features">
+    <span>&#10003; AI-powered</span>
+    <span>&#10003; Real-time collab</span>
+    <span>&#10003; E2E encrypted</span>
+  </div>
+</div>
+
+<script>
+function showTab(tab) {
+  document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('form-register').classList.toggle('hidden', tab !== 'register');
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const err = document.getElementById('login-error');
+  err.classList.add('hidden');
+  const res = await fetch('/api/login', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({email, password})
+  });
+  const data = await res.json();
+  if (data.error) { err.textContent = data.error; err.classList.remove('hidden'); }
+  else window.location.href = '/dashboard';
+}
+
+async function doRegister() {
+  const name = document.getElementById('reg-name').value;
+  const email = document.getElementById('reg-email').value;
+  const password = document.getElementById('reg-password').value;
+  const err = document.getElementById('reg-error');
+  err.classList.add('hidden');
+  if (password.length < 6) { err.textContent = 'Password must be at least 6 characters.'; err.classList.remove('hidden'); return; }
+  const res = await fetch('/api/register', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({name, email, password})
+  });
+  const data = await res.json();
+  if (data.error) { err.textContent = data.error; err.classList.remove('hidden'); }
+  else window.location.href = '/dashboard';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') { const tab = document.getElementById('form-login').classList.contains('hidden') ? doRegister : doLogin; tab(); } });
+</script>
+</body>
+</html>

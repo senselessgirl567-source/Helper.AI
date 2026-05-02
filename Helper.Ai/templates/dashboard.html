@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Helper.ai — Dashboard</title>
+<link rel="stylesheet" href="/static/css/style.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-text">Helper<span class="logo-accent">.ai</span></span>
+      <button class="sidebar-close" onclick="toggleSidebar()">&#10005;</button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">Create</div>
+      <a class="nav-item active" data-view="dashboard" onclick="switchView('dashboard',this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" data-view="ppt" onclick="switchView('ppt',this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="10" rx="1.5"/><path d="M8 12v2M5 14h6"/></svg>
+        Auto PPT
+      </a>
+      <a class="nav-item" data-view="report" onclick="switchView('report',this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 1h7l3 3v11H3z"/><path d="M10 1v3h3"/><path d="M5 7h6M5 9.5h6M5 12h4"/></svg>
+        Reports
+      </a>
+      <a class="nav-item" data-view="notes" onclick="switchView('notes',this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2h12v12H2z" rx="1"/><path d="M5 5h6M5 8h6M5 11h3"/></svg>
+        Smart Notes
+      </a>
+
+      <div class="nav-group-label">Collaborate</div>
+      <a class="nav-item" data-view="collab" onclick="switchView('collab',this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><circle cx="11" cy="5" r="2"/><path d="M1 14c0-3 2-4 5-4s5 1 5 4"/><path d="M13 14c0-2-1-3-2-3.5"/></svg>
+        Live Sharing
+      </a>
+      <a class="nav-item" data-view="vault" onclick="switchView('vault',this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="12" height="8" rx="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/><circle cx="8" cy="11" r="1.5"/></svg>
+        My Vault
+      </a>
+
+      <div class="nav-group-label">Files</div>
+      <a class="nav-item" data-view="files" onclick="switchView('files',this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h5l2 2h5v9H2z"/></svg>
+        Cloud Files
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div>
+          <div class="user-name" id="user-name-display">Loading...</div>
+          <div class="user-email" id="user-email-display"></div>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Logout">&#8594;</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main-area">
+    <header class="topbar">
+      <button class="menu-btn" onclick="toggleSidebar()">&#9776;</button>
+      <h1 class="page-title" id="page-title">Dashboard</h1>
+      <div class="topbar-badges">
+        <span class="badge badge-live" id="live-badge">&#9679; Live</span>
+        <span class="badge badge-secure">&#128274; Encrypted</span>
+      </div>
+      <div class="topbar-spacer"></div>
+      <button class="btn btn-ghost" onclick="shareCurrentDoc()">Share</button>
+      <button class="btn btn-primary" id="new-btn" onclick="handleNewBtn()">+ New</button>
+    </header>
+
+    <!-- Dashboard View -->
+    <div class="view active" id="view-dashboard">
+      <div class="content-pad">
+        <div class="ai-prompt-panel">
+          <div class="panel-label">What do you want to create today?</div>
+          <div class="prompt-row">
+            <input class="prompt-input" id="prompt-input" placeholder="Enter a topic or paste your notes…" />
+            <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Voice input">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="1" width="6" height="10" rx="3"/><path d="M4 10a6 6 0 0 0 12 0"/><line x1="10" y1="16" x2="10" y2="19"/><line x1="7" y1="19" x2="13" y2="19"/></svg>
+            </button>
+          </div>
+          <div class="tool-selector">
+            <div class="tool-card selected" data-tool="ppt" onclick="selectTool(this)">
+              <div class="tool-icon" style="background:#FAECE7;color:#993C1D;">PPT</div>
+              <div class="tool-name">Auto PPT</div>
+              <div class="tool-sub">Full slide deck</div>
+            </div>
+            <div class="tool-card" data-tool="report" onclick="selectTool(this)">
+              <div class="tool-icon" style="background:#E6F1FB;color:#185FA5;">REP</div>
+              <div class="tool-name">Report</div>
+              <div class="tool-sub">Structured report</div>
+            </div>
+            <div class="tool-card" data-tool="notes" onclick="selectTool(this)">
+              <div class="tool-icon" style="background:#E1F5EE;color:#0F6E56;">NOTE</div>
+              <div class="tool-name">Smart Notes</div>
+              <div class="tool-sub">Clean study notes</div>
+            </div>
+          </div>
+          <div class="prompt-actions">
+            <label class="private-toggle">
+              <input type="checkbox" id="make-private"/> Private &amp; encrypted
+            </label>
+            <button class="btn btn-primary" onclick="generateContent()">Generate ✦</button>
+          </div>
+          <div id="gen-status" class="gen-status hidden"></div>
+        </div>
+
+        <div class="two-col">
+          <div class="panel">
+            <div class="panel-label">Recent documents</div>
+            <div id="recent-docs">
+              <div class="empty-state">No documents yet. Generate your first one above!</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-label">Live collaboration</div>
+            <div id="collab-room-input" style="margin-bottom:10px;">
+              <input class="small-input" id="room-id-input" placeholder="Room ID (e.g. bio-group-1)" />
+              <button class="btn btn-ghost btn-sm" onclick="joinRoom()">Join</button>
+            </div>
+            <div id="collab-users"><div class="empty-state">Not in a room yet.</div></div>
+            <div id="share-url-box" class="hidden" style="margin-top:10px;">
+              <input class="small-input" id="share-url-display" readonly />
+              <button class="btn btn-ghost btn-sm" onclick="copyShareUrl()">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PPT View -->
+    <div class="view" id="view-ppt">
+      <div class="content-pad">
+        <div class="panel" style="max-width:700px;">
+          <div class="panel-label">Auto PPT Maker</div>
+          <input class="prompt-input" id="ppt-topic" placeholder="Enter presentation topic…" style="margin-bottom:10px;" />
+          <div class="prompt-actions">
+            <label class="private-toggle"><input type="checkbox" id="ppt-private"/> Private</label>
+            <button class="btn btn-primary" onclick="generatePPT()">Generate Slides ✦</button>
+          </div>
+          <div id="ppt-status" class="gen-status hidden"></div>
+          <div id="ppt-result"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Report View -->
+    <div class="view" id="view-report">
+      <div class="content-pad">
+        <div class="panel" style="max-width:700px;">
+          <div class="panel-label">Report Generator</div>
+          <input class="prompt-input" id="report-topic" placeholder="Enter report topic…" style="margin-bottom:10px;" />
+          <div class="prompt-actions">
+            <label class="private-toggle"><input type="checkbox" id="report-private"/> Private</label>
+            <button class="btn btn-primary" onclick="generateReport()">Generate Report ✦</button>
+          </div>
+          <div id="report-status" class="gen-status hidden"></div>
+          <div id="report-result"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes View -->
+    <div class="view" id="view-notes">
+      <div class="content-pad">
+        <div class="panel" style="max-width:700px;">
+          <div class="panel-label">Smart Notes Maker</div>
+          <textarea class="prompt-input" id="notes-input" rows="5" placeholder="Paste your raw text, topic, or speak using the mic…" style="resize:vertical;"></textarea>
+          <div class="prompt-actions" style="margin-top:8px;">
+            <button class="mic-btn" onclick="toggleMicNotes()" title="Voice input">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="1" width="6" height="10" rx="3"/><path d="M4 10a6 6 0 0 0 12 0"/><line x1="10" y1="16" x2="10" y2="19"/><line x1="7" y1="19" x2="13" y2="19"/></svg>
+            </button>
+            <label class="private-toggle"><input type="checkbox" id="notes-private"/> Private</label>
+            <button class="btn btn-primary" onclick="generateNotes()">Create Notes ✦</button>
+          </div>
+          <div id="notes-status" class="gen-status hidden"></div>
+          <div id="notes-result"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Collab View -->
+    <div class="view" id="view-collab">
+      <div class="content-pad">
+        <div class="collab-layout">
+          <div class="panel collab-sidebar-panel">
+            <div class="panel-label">Collaboration room</div>
+            <input class="small-input" id="collab-room-name" placeholder="Room name…" style="margin-bottom:6px;"/>
+            <button class="btn btn-primary btn-block" onclick="joinCollabRoom()">Join / Create Room</button>
+            <div id="room-status" class="gen-status" style="margin-top:8px;display:none;"></div>
+            <hr class="divider"/>
+            <div class="panel-label">Members online</div>
+            <div id="members-list"><div class="empty-state">Join a room to see members.</div></div>
+          </div>
+          <div class="panel collab-editor-panel">
+            <div class="panel-label">Shared note editor <span class="badge badge-live" id="collab-live-badge" style="display:none;">&#9679; Live</span></div>
+            <textarea id="collab-editor" class="collab-textarea" placeholder="Start typing — everyone in the room sees changes in real time…" oninput="broadcastNote()"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vault View -->
+    <div class="view" id="view-vault">
+      <div class="content-pad">
+        <div class="panel" style="max-width:600px;">
+          <div class="panel-label">&#128274; My Vault — private &amp; encrypted files</div>
+          <div id="vault-docs"><div class="empty-state">No private documents yet.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Files View -->
+    <div class="view" id="view-files">
+      <div class="content-pad">
+        <div class="panel">
+          <div class="panel-label">Cloud files</div>
+          <div id="all-docs"><div class="empty-state">No documents yet.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-area -->
+</div><!-- /app-shell -->
+
+<!-- ── Result Modal ── -->
+<div id="result-modal" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal()"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <span id="modal-title">Result</span>
+      <button onclick="closeModal()">&#10005;</button>
+    </div>
+    <div id="modal-body" class="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+      <button class="btn btn-primary" onclick="shareCurrentDoc()">Share</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
