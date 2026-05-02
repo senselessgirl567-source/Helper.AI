@@ -1,19 +1,15 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/app.py", "use": "@vercel/python" },
-    { "src": "static/**/*", "use": "@vercel/static" }
+    { "src": "api/app.py", "use": "@vercel/python" }
   ],
   "routes": [
-    { "src": "/static/(.*)", "dest": "/static/$1" },
-    { "src": "/(.*)", "dest": "/api/app.py" }
+    { "src": "/(.*)", "dest": "api/app.py" }
   ],
   "env": {
     "SECRET_KEY": "@helperai_secret_key",
     "DATABASE_URL": "@helperai_database_url",
     "NEON_DATABASE_URL": "@helperai_neon_database_url",
-    "GROQ_PROJECT_ID": "@helperai_groq_project_id",
-    "GROQ_DATASET": "@helperai_groq_dataset",
     "GROQ_API_TOKEN": "@helperai_groq_api_token"
   }
 }
