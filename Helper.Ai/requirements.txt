@@ -1,9 +1,5 @@
-flask>=3.0
-# flask-socketio>=5.3
-flask-sqlalchemy>=3.1
-flask-bcrypt>=1.0
-# python-engineio>=4.9
-# python-socketio>=5.11
-requests>=2.33
-python-dotenv>=1.0
-psycopg2-binary>=2.9
+ flask
+flask-bcrypt
+flask-sqlalchemy
+psycopg2-binary
+groq
